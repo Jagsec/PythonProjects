@@ -3,10 +3,12 @@
 import sys, getopt
 
 def checker(password):
+    #counters for each criteria
     lowercaseCounter = 0
     uppercaseCounter = 0
     numberCounter = 0
     specialCounter = 0
+    #checks for lowercase, uppercase, numbers and special characters on each password
     for letter in password:
         if letter.islower():
             lowercaseCounter += 1
@@ -19,6 +21,7 @@ def checker(password):
     return lowercaseCounter, uppercaseCounter, numberCounter, specialCounter
 
 def securityEvaluation(lowercaseCounter, uppercaseCounter, numberCounter, specialCounter, password):
+    #Evaluates the security level of each password by criteria met.
     securityLevel = 0
     securityText = ["Very Weak", "Weak", "Moderate", "Strong", "Very Strong", "Optimal"]
     if lowercaseCounter > 0:
@@ -36,6 +39,7 @@ def securityEvaluation(lowercaseCounter, uppercaseCounter, numberCounter, specia
 def main(argv):
     input_file = ""
     output_file = ""
+    #gets the arguments from the command line
     try:
         opts, args = getopt.getopt(argv, "hi:o:", ["input_file=", "output_file="])
     except getopt.GetoptError:
@@ -49,8 +53,10 @@ def main(argv):
         elif opt in ("-o", "--output_file"):
             output_file = arg
     if input_file != "":
+        #stores every password on the txt file on a list
         with open(input_file, "r") as file_object:
             passwords = file_object.readlines()
+        #checks each password on the list and writes the result to the output
         for password in passwords:
             password = password.rstrip()
             lwcC, upcC, numC, spC = checker(password)
