@@ -1,4 +1,4 @@
-import ipaddress
+import ipaddress, sys, getopt
 
 #Address format: ip address,network address/mask
 #Example: 192.168.10.10,192.168.10.0/24
@@ -24,18 +24,16 @@ def compareNetworkAddr(line):
         isCorrect = False
     return isCorrect
 
-def writeAddresses(filename):
+def writeAddresses(input_file, output_file1, output_file2):
     #Reads the addresses on the txt file
-    with open(filename, "r") as file_object:
+    with open(input_file, "r") as file_object:
         lines = file_object.readlines()
 
     #Creates txt for the correct and incorrect addresses
-    filename1 = "Valid-addresses.txt"
-    with open(filename1, "w") as file_object:
+    with open(output_file1, "w") as file_object:
         file_object.write("Valid IP addresses:\n")
 
-    filename2 = "Incorrect-addresses.txt"
-    with open(filename2, "w") as file_object:
+    with open(output_file2, "w") as file_object:
         file_object.write("Incorrect IP addresses:\n")
 
     validAddresses = 0
@@ -44,23 +42,40 @@ def writeAddresses(filename):
     for line in lines:
         if compareNetworkAddr(line.rstrip()):
             validAddresses += 1
-            with open(filename1, "a") as file_object:
+            with open(output_file1, "a") as file_object:
                 file_object.write(f"Address {validAddresses}: {line} \n")
         else:
             notValidAddresses += 1
-            with open(filename2, "a") as file_object:
+            with open(output_file2, "a") as file_object:
                 file_object.write(f"Address {notValidAddresses}: {line} \n")
 
     #Write the total correct and incorrect amount of addresses to each file
-    with open(filename1, "a") as file_object:
+    with open(output_file1, "a") as file_object:
         file_object.write(f"Total valid addresses: {validAddresses}")
     
-    with open(filename2, "a") as file_object:
+    with open(output_file2, "a") as file_object:
         file_object.write(f"Total incorrect addresses: {notValidAddresses}")
 
-
-filename = input("Enter the file name: \n")
-writeAddresses(filename)
-
-
-
+def main(argv):
+    input_file = ""
+    output_file1 = "Valid-addresses.txt"
+    output_file2 = "Incorrect-addresses.txt"
+    try:
+        opts, args = getopt.getopt(argv, "hi:", ["input_file="])
+    except getopt.GetoptError:
+        print("python ip_address_checker.py -i <input_file>")
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == "-h":
+            print("""python ip_address_checker.py -i <input_file>
+            The txt file must be in the following format
+            Address format: ip address,network address/mask
+            Example: 192.168.10.10,192.168.10.0/24""")
+        elif opt in ("-i", "--input_file"):
+            input_file = arg
+        if input_file != "":
+            writeAddresses(input_file, output_file1, output_file2)
+            print(f"Check the output files {output_file1} and {output_file2} for results")
+            
+if __name__ == "__main__":
+    main(sys.argv[1:])
